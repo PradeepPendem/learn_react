@@ -1,0 +1,19 @@
+.searchInput {
+  width: -webkit-fill-available;
+  margin: 16px 16px 0px;
+}
+.cardsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  background-color: #f3f4f6;
+  height: 60px;
+}
