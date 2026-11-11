@@ -1,131 +1,134 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from './assets/vite.svg';
-import heroImg from './assets/hero.png';
+import React, { useEffect } from 'react';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { store } from './store/store';
+import {
+  selectUiState,
+  setActiveTab,
+  toggleTheme
+} from './store/uiSlice';
+import CompoundComponents from './components/CompoundComponents';
+import StateManagementDashboard from './components/StateManagementDashboard';
+import PerformanceVisualizer from './components/PerformanceVisualizer';
+import CustomHooksShowcase from './components/CustomHooksShowcase';
+import {
+  Sparkles,
+  Database,
+  Zap,
+  Eye,
+  Sun,
+  Moon,
+  Github,
+  BookOpen
+} from 'lucide-react';
 import './App.css';
-import Header from './components/Header.jsx';
-import ParentCounter from './components/ParentCounter.jsx';
-import Users from './components/Users.jsx';
-import PaymentForm from './components/PaymentForm.jsx';
-import LoginForm from './components/LoginForm.jsx';
 
-function App() {
-  const [count, setCount] = useState(0);
+// Initialize TanStack React Query Client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Prevents refetching when switching browser tabs
+      retry: false
+    }
+  }
+});
+
+function AppContent() {
+  const { theme, activeTab } = useSelector(selectUiState);
+  const dispatch = useDispatch();
+
+  // Apply light/dark data attribute to HTML tag
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  // Dynamic Content Router
+  const renderActiveModule = () => {
+    switch (activeTab) {
+      case 'patterns':
+        return <CompoundComponents />;
+      case 'state':
+        return <StateManagementDashboard />;
+      case 'perf':
+        return <PerformanceVisualizer />;
+      case 'hooks':
+        return <CustomHooksShowcase />;
+      default:
+        return <CompoundComponents />;
+    }
+  };
 
   return (
-    <>
-      <LoginForm></LoginForm>
-      {/* <ParentCounter></ParentCounter>
-      <Users></Users> */}
-      <Header></Header>
-      {/* <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-container">
+      {/* Sidebar Navigation */}
+      <aside className="sidebar">
+        <div className="logo-section">
+          <BookOpen className="logo-icon w-6 h-6" />
+          <span className="logo-text">React Masterclass</span>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        <nav className="nav-links">
+          <button
+            className={`nav-btn ${activeTab === 'patterns' ? 'active' : ''}`}
+            onClick={() => dispatch(setActiveTab('patterns'))}
+          >
+            <Sparkles className="w-4 h-4" />
+            Compound Components
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'state' ? 'active' : ''}`}
+            onClick={() => dispatch(setActiveTab('state'))}
+          >
+            <Database className="w-4 h-4" />
+            State Management
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'perf' ? 'active' : ''}`}
+            onClick={() => dispatch(setActiveTab('perf'))}
+          >
+            <Zap className="w-4 h-4" />
+            Performance & Memo
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'hooks' ? 'active' : ''}`}
+            onClick={() => dispatch(setActiveTab('hooks'))}
+          >
+            <Eye className="w-4 h-4" />
+            Custom Hooks Lab
+          </button>
+        </nav>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        {/* Footer info in sidebar */}
+        <div className="mt-auto border-t border-border pt-4 text-xs text-secondary flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <span>Theme Mode:</span>
+            <button
+              className="btn-icon"
+              onClick={() => dispatch(toggleTheme())}
+              aria-label="Toggle Theme"
+            >
+              {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </button>
+          </div>
+          <span className="text-2xs text-secondary opacity-60">Created with Antigravity AI</span>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      </aside>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section> */}
-    </>
+      {/* Main Workspace */}
+      <main className="main-content">
+        {renderActiveModule()}
+      </main>
+    </div>
   );
 }
 
-export default App;
+// Wrapper to provide Redux and Query Client contexts
+export default function App() {
+  return (
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <AppContent />
+      </QueryClientProvider>
+    </Provider>
+  );
+}
